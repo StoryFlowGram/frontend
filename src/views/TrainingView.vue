@@ -139,8 +139,9 @@ const emit = defineEmits(['close', 'show-results'])
 
 const currentIndex = ref(0)
 const isFlipped = ref(false)
-const isSending = ref(false) 
+const isSending = ref(false)
 const correctAnswers = ref(0)
+const startTime = ref(Date.now()) 
 
 const selectedAnswer = ref(null)
 const currentOptions = ref([])
@@ -150,10 +151,36 @@ const currentWord = computed(() => props.cards[currentIndex.value])
 const progress = computed(() => ((currentIndex.value + 1) / props.cards.length) * 100)
 
 
+const calculateQuality = (isCorrect, durationMs, mode) => {
+  const sec = (durationMs / 1000).toFixed(2)
+  
+  let quality = 1
+  if (isCorrect) {
+    if (mode === 'flashcards') {
+      if (durationMs < 2000) quality = 5
+      else if (durationMs < 15000) quality = 4
+      else quality = 3
+    } else if (mode === 'guess') {
+      if (durationMs < 3000) quality = 5
+      else if (durationMs < 10000) quality = 4
+      else quality = 3
+    }
+  }
+
+  console.group('📊 SRS Calculation')
+  console.log('Mode:', mode)
+  console.log('Time:', sec + 's')
+  console.log('Correct:', isCorrect)
+  console.log('Result Quality:', quality)
+  console.groupEnd()
+
+  return quality
+}
+
 const sendReview = async (cardId, quality) => {
   try {
     isSending.value = true
-    await axios.patch(`${VITE_API_URL}/cards/review`, {
+    await axios.patch(`${import.meta.env.VITE_API_URL}/learning/review`, {
       card_id: cardId,
       quality: quality
     }, { withCredentials: true })
@@ -169,15 +196,15 @@ const flipCard = () => {
   isFlipped.value = !isFlipped.value
 }
 
+
 const handleAnswer = async (remembered) => {
-  const quality = remembered ? 5 : 1
+  const duration = Date.now() - startTime.value
+  const quality = calculateQuality(remembered, duration, props.mode)
   
   await sendReview(currentWord.value.id, quality)
 
-
   if (remembered) correctAnswers.value++
   
-
   goNext()
 }
 
@@ -186,12 +213,10 @@ const generateOptions = () => {
 
   const correct = currentWord.value.translation
   
-
   const allTranslations = props.cards
     .map(c => c.translation)
     .filter(t => t !== correct)
   
-
   const wrongAnswers = allTranslations
     .sort(() => Math.random() - 0.5)
     .slice(0, 3)
@@ -202,12 +227,13 @@ const generateOptions = () => {
 
 const selectAnswer = async (option) => {
   if (selectedAnswer.value !== null) return
+  
+  const duration = Date.now() - startTime.value 
   selectedAnswer.value = option
   
   const isCorrect = option === currentWord.value.translation
   
-
-  const quality = isCorrect ? 5 : 1
+  const quality = calculateQuality(isCorrect, duration, props.mode)
   await sendReview(currentWord.value.id, quality)
 
   if (isCorrect) correctAnswers.value++
@@ -227,14 +253,12 @@ const getOptionClass = (option) => {
   return 'bg-gray-100 text-gray-400'
 }
 
-
 const goNext = () => {
   isFlipped.value = false
   selectedAnswer.value = null
   
   if (currentIndex.value < props.cards.length - 1) {
     currentIndex.value++
-    if (props.mode === 'guess') generateOptions()
   } else {
     finishTraining()
   }
@@ -252,7 +276,14 @@ const finishTraining = () => {
 }
 
 
+watch(currentIndex, () => {
+  console.log(`Карта змінилась. Таймер зброшено: ${new Date().toLocaleTimeString()}`)
+  startTime.value = Date.now()
+  if (props.mode === 'guess') generateOptions()
+})
+
 watch(() => props.cards, (newVal) => {
+  startTime.value = Date.now() 
   if (newVal.length > 0 && props.mode === 'guess') {
     generateOptions()
   }
