@@ -1,0 +1,33 @@
+name: Frontend CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name:  Збірка та перевірка
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Отримання коду
+        uses: actions/checkout@v4
+
+      - name: Налаштування Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Встановлення залежностей
+        run: npm ci
+
+      - name: Запуск тестів
+        run: npm run test --if-present
+
+      - name: Збірка застосунку
+        run: npm run build
