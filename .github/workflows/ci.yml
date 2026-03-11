@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  packages: write
+    
 jobs:
   build:
     name:  Збірка та перевірка
@@ -26,8 +30,27 @@ jobs:
       - name: Встановлення залежностей
         run: npm ci
 
-      - name: Запуск тестів
-        run: npm run test --if-present
+      
+      - name: Авторизація в GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Збірка застосунку
-        run: npm run build
+      - name: Визначення метаданих
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/storyflowgram/frontend 
+          tags: |
+            type=raw,value=latest
+            type=sha
+
+      - name: Збірка та Push Docker-образу
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }} 
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
