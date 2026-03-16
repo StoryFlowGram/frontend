@@ -17,7 +17,8 @@ export default defineConfig(({ mode }) => {
       allowedHosts: [
         '.ngrok-free.app',
         'localhost',
-        '127.0.0.1'
+        '127.0.0.1',
+        env.VITE_DOMAIN
       ],
       proxy: {
         '/api': {
