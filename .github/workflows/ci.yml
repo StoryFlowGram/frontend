@@ -54,3 +54,30 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }} 
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Виконуємо деплой на сервері
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /home/deployer/sfg-app
+
+            # Логінимося в GHCR на сервері
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # Завантажуємо нові версії образів
+            docker compose -f docker-compose-prod.yml pull
+
+            # Перезапускаємо сервіси
+            docker compose -f docker-compose-prod.yml up -d --remove-orphans
+
+            # Очищаємо старі образи
+            docker image prune -f
