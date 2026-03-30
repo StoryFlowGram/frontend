@@ -54,6 +54,11 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }} 
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VITE_API_URL=${{ secrets.VITE_API_URL }}
+            VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+            VITE_ENABLE_ERUDA=${{ secrets.VITE_ENABLE_ERUDA }}
+        
 
   deploy:
     runs-on: ubuntu-latest
