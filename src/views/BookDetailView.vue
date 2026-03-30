@@ -23,7 +23,7 @@
             <img 
               v-if="book.pic_url" 
               :src="book.pic_url" 
-              alt="Cover" 
+              alt="Обкладинка книги" 
               class="w-full h-full object-cover"
               @error="(e) => e.target.style.display = 'none'"
             />
@@ -190,10 +190,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
 import { ArrowLeft, BookOpen, Star, Plus, Check } from 'lucide-vue-next'
-
-const API_URL = import.meta.env.VITE_API_URL
+import api, { getErrorMessage } from '@/shared/api/client'
 
 const props = defineProps({
   book: {
@@ -214,34 +212,36 @@ const toastMessage = ref('Книга успішно додана!')
 const localIsAdded = ref(props.book.isAdded || false)
 const localUserBookId = ref(props.book.userBookId || null)
 
+const showTimedToast = (message) => {
+  toastMessage.value = message
+  showToast.value = true
+
+  setTimeout(() => {
+    showToast.value = false
+  }, 3000)
+}
+
 const formatWordCount = (count) => {
   if (!count) return '5.2k'
-  if (count >= 1000) {
-    return (count / 1000).toFixed(1) + 'k'
-  }
+  if (count >= 1000) return `${(count / 1000).toFixed(1)}k`
   return count.toString()
 }
 
 const estimateReadingTime = (wordCount) => {
   if (!wordCount) return '3'
   const wordsPerHour = 10000
-  const hours = Math.ceil(wordCount / wordsPerHour)
-  return hours.toString()
+  return Math.ceil(wordCount / wordsPerHour).toString()
 }
 
 const loadChapters = async () => {
   isLoadingChapters.value = true
   chaptersError.value = ''
-  
+
   try {
-    const response = await axios.get(`${API_URL}/book/${props.book.id}/chapters`, {
-      withCredentials: true
-    })
-    
+    const response = await api.get(`/book/${props.book.id}/chapters`)
     chapters.value = response.data.sort((a, b) => a.order_number - b.order_number)
   } catch (error) {
-    console.error('Помилка завантаження розділів:', error)
-    chaptersError.value = 'Не вдалося завантажити розділи. Спробуйте пізніше.'
+    chaptersError.value = getErrorMessage(error, 'Не вдалося завантажити розділи. Спробуйте пізніше.')
   } finally {
     isLoadingChapters.value = false
   }
@@ -249,42 +249,29 @@ const loadChapters = async () => {
 
 const handleAddToLibrary = async () => {
   isAddingToLibrary.value = true
-  
+
   try {
-    const response = await axios.post(`${API_URL}/reader/`, {
+    const response = await api.post('/reader/', {
       book_id: props.book.id,
       overall_progress: 0
-    }, {
-      withCredentials: true
     })
-    
+
     localUserBookId.value = response.data.id || response.data.user_book_id
     localIsAdded.value = true
-    
+    showTimedToast('Книга успішно додана!')
 
-    toastMessage.value = 'Книга успішно додана!'
-    showToast.value = true
-    setTimeout(() => {
-      showToast.value = false
-    }, 3000)
-    
-
-    emit('add-to-library', { ...props.book, isAdded: true, userBookId: localUserBookId.value })
-    
+    emit('add-to-library', {
+      ...props.book,
+      isAdded: true,
+      userBookId: localUserBookId.value
+    })
   } catch (error) {
-    if (error.response && error.response.status === 409) {
+    if (error?.response?.status === 409) {
       localIsAdded.value = true
-      
-      toastMessage.value = 'Книга вже в бібліотеці!'
-      showToast.value = true
-      setTimeout(() => {
-        showToast.value = false
-      }, 3000)
-      
+      showTimedToast('Книга вже є в бібліотеці.')
       emit('add-to-library', { ...props.book, isAdded: true })
     } else {
-      console.error('Помилка додавання книги:', error)
-      alert('Не вдалося додати книгу. Спробуйте ще раз.')
+      showTimedToast(getErrorMessage(error, 'Не вдалося додати книгу. Спробуйте ще раз.'))
     }
   } finally {
     isAddingToLibrary.value = false
@@ -298,31 +285,32 @@ const handleReadBook = () => {
 }
 
 const openChapter = (chapter) => {
-  emit('open-reader', { 
-    book: props.book, 
+  emit('open-reader', {
+    book: props.book,
     chapter,
     userBookId: localUserBookId.value
   })
 }
 
-onMounted(() => {
-  loadChapters()
-  
-  if (!props.book.isAdded) {
-    axios.get(`${API_URL}/reader/`, { withCredentials: true })
-      .then(response => {
-        const userBooks = response.data.items || response.data || []
-        const foundBook = userBooks.find(b => b.book_id === props.book.id)
-        if (foundBook) {
-          localIsAdded.value = true
-          localUserBookId.value = foundBook.id || foundBook.user_book_id
-        }
-      })
-      .catch(err => console.error('Error checking library:', err))
+onMounted(async () => {
+  await loadChapters()
+
+  if (props.book.isAdded) return
+
+  try {
+    const response = await api.get('/reader/')
+    const userBooks = response.data.items || response.data || []
+    const foundBook = userBooks.find((book) => book.book_id === props.book.id)
+
+    if (foundBook) {
+      localIsAdded.value = true
+      localUserBookId.value = foundBook.id || foundBook.user_book_id
+    }
+  } catch (error) {
+    void error
   }
 })
 </script>
-
 <style scoped>
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom);
@@ -343,3 +331,5 @@ onMounted(() => {
   opacity: 0;
 }
 </style>
+
+
