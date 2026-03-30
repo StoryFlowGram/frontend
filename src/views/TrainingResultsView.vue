@@ -1,18 +1,18 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-teal-50 via-white to-emerald-50 flex items-center justify-center px-6 py-12">
+  <div
+    class="min-h-screen bg-gradient-to-br from-teal-50 via-white to-emerald-50 flex items-center justify-center px-6 py-12"
+  >
     <div class="max-w-md w-full">
       <!-- Success animation container -->
       <div class="text-center mb-8 animate-bounce-in">
-        <div class="w-24 h-24 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl animate-scale-in">
+        <div
+          class="w-24 h-24 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl animate-scale-in"
+        >
           <Check class="w-14 h-14 text-white" :stroke-width="3" />
         </div>
-        
-        <h1 class="text-3xl font-bold text-black mb-3 animate-slide-up">
-          Ми молодці! 🎉
-        </h1>
-        <p class="text-gray-600 text-lg animate-slide-up delay-100">
-          Ви завершили тренування
-        </p>
+
+        <h1 class="text-3xl font-bold text-black mb-3 animate-slide-up">Ми молодці! 🎉</h1>
+        <p class="text-gray-600 text-lg animate-slide-up delay-100">Ви завершили тренування</p>
       </div>
 
       <!-- Results Card -->
@@ -22,7 +22,13 @@
             {{ wordsStudied }}
           </div>
           <p class="text-gray-600 text-lg">
-            {{ wordsStudied === 1 ? 'слово вивчено' : wordsStudied < 5 ? 'слова вивчено' : 'слів вивчено' }}
+            {{
+              wordsStudied === 1
+                ? 'слово вивчено'
+                : wordsStudied < 5
+                  ? 'слова вивчено'
+                  : 'слів вивчено'
+            }}
           </p>
         </div>
 
@@ -33,7 +39,9 @@
             <p class="text-sm text-gray-600">Правильно</p>
           </div>
           <div class="bg-gray-50 rounded-2xl p-4 text-center">
-            <div class="text-2xl font-bold text-gray-600 mb-1">{{ totalWords - correctAnswers }}</div>
+            <div class="text-2xl font-bold text-gray-600 mb-1">
+              {{ totalWords - correctAnswers }}
+            </div>
             <p class="text-sm text-gray-600">Помилок</p>
           </div>
         </div>
@@ -45,7 +53,7 @@
             <span class="font-semibold">{{ accuracy }}%</span>
           </div>
           <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
-            <div 
+            <div
               class="h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full transition-all duration-1000 ease-out"
               :style="{ width: accuracy + '%' }"
             ></div>

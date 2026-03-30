@@ -1,5 +1,7 @@
 <template>
-  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-area-bottom z-50">
+  <nav
+    class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-area-bottom z-50"
+  >
     <div class="flex justify-around items-center h-16 px-2">
       <button
         v-for="item in navItems"
@@ -11,7 +13,7 @@
           v-if="currentView === item.id"
           class="absolute top-0 w-1.5 h-1.5 bg-teal-400 rounded-full"
         ></div>
-        
+
         <component
           :is="item.icon"
           :class="[

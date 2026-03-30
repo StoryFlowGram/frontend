@@ -1,6 +1,11 @@
-<template>
+﻿<template>
   <div class="min-h-screen" :class="themeClasses.bg">
-    <div :class="['sticky top-0 backdrop-blur-sm border-b z-10 transition-colors duration-300', themeClasses.topBar]">
+    <div
+      :class="[
+        'sticky top-0 backdrop-blur-sm border-b z-10 transition-colors duration-300',
+        themeClasses.topBar
+      ]"
+    >
       <div class="flex items-center justify-between px-4 py-3">
         <button
           @click="$emit('close')"
@@ -21,21 +26,32 @@
       </div>
 
       <div :class="['h-1', themeClasses.progressBg]">
-        <div class="h-full bg-teal-400 transition-all duration-300" :style="{ width: readingProgress + '%' }"></div>
+        <div
+          class="h-full bg-teal-400 transition-all duration-300"
+          :style="{ width: readingProgress + '%' }"
+        ></div>
       </div>
     </div>
 
     <Transition name="settings-slide">
       <div
         v-if="showSettings"
-        :class="['fixed inset-x-0 top-16 border-b shadow-2xl z-20 p-6 space-y-6 transition-colors duration-300', themeClasses.settingsPanel]"
+        :class="[
+          'fixed inset-x-0 top-16 border-b shadow-2xl z-20 p-6 space-y-6 transition-colors duration-300',
+          themeClasses.settingsPanel
+        ]"
       >
         <div>
-          <label :class="['block text-sm font-medium mb-3', themeClasses.text]">Розмір шрифту</label>
+          <label :class="['block text-sm font-medium mb-3', themeClasses.text]"
+            >Розмір шрифту</label
+          >
           <div class="flex items-center gap-4">
             <button
               @click="decreaseFontSize"
-              :class="['p-2.5 rounded-full transition-all duration-200 hover:scale-110', themeClasses.controlButton]"
+              :class="[
+                'p-2.5 rounded-full transition-all duration-200 hover:scale-110',
+                themeClasses.controlButton
+              ]"
             >
               <Minus class="w-5 h-5" />
             </button>
@@ -43,7 +59,7 @@
               <div :class="['h-2 rounded-full overflow-hidden', themeClasses.sliderBg]">
                 <div
                   class="h-full bg-gradient-to-r from-teal-400 to-emerald-500 transition-all duration-200"
-                  :style="{ width: ((readerSettings.fontSize - 14) / 6 * 100) + '%' }"
+                  :style="{ width: ((readerSettings.fontSize - 14) / 6) * 100 + '%' }"
                 ></div>
               </div>
               <div class="text-center mt-2 text-sm font-medium text-teal-600">
@@ -52,7 +68,10 @@
             </div>
             <button
               @click="increaseFontSize"
-              :class="['p-2.5 rounded-full transition-all duration-200 hover:scale-110', themeClasses.controlButton]"
+              :class="[
+                'p-2.5 rounded-full transition-all duration-200 hover:scale-110',
+                themeClasses.controlButton
+              ]"
             >
               <Plus class="w-5 h-5" />
             </button>
@@ -60,11 +79,16 @@
         </div>
 
         <div>
-          <label :class="['block text-sm font-medium mb-3', themeClasses.text]">Міжрядковий інтервал</label>
+          <label :class="['block text-sm font-medium mb-3', themeClasses.text]"
+            >Міжрядковий інтервал</label
+          >
           <div class="flex items-center gap-4">
             <button
               @click="decreaseLineHeight"
-              :class="['p-2.5 rounded-full transition-all duration-200 hover:scale-110', themeClasses.controlButton]"
+              :class="[
+                'p-2.5 rounded-full transition-all duration-200 hover:scale-110',
+                themeClasses.controlButton
+              ]"
             >
               <Minus class="w-5 h-5" />
             </button>
@@ -72,7 +96,7 @@
               <div :class="['h-2 rounded-full overflow-hidden', themeClasses.sliderBg]">
                 <div
                   class="h-full bg-gradient-to-r from-teal-400 to-emerald-500 transition-all duration-200"
-                  :style="{ width: ((readerSettings.lineHeight - 1.4) / 0.8 * 100) + '%' }"
+                  :style="{ width: ((readerSettings.lineHeight - 1.4) / 0.8) * 100 + '%' }"
                 ></div>
               </div>
               <div class="text-center mt-2 text-sm font-medium text-teal-600">
@@ -81,7 +105,10 @@
             </div>
             <button
               @click="increaseLineHeight"
-              :class="['p-2.5 rounded-full transition-all duration-200 hover:scale-110', themeClasses.controlButton]"
+              :class="[
+                'p-2.5 rounded-full transition-all duration-200 hover:scale-110',
+                themeClasses.controlButton
+              ]"
             >
               <Plus class="w-5 h-5" />
             </button>
@@ -121,7 +148,7 @@
                   ? 'ring-4 ring-teal-400 shadow-lg scale-105'
                   : 'hover:shadow-md'
               ]"
-              :style="{ 
+              :style="{
                 backgroundColor: themeOption.preview.bg,
                 color: themeOption.preview.text
               }"
@@ -133,7 +160,7 @@
       </div>
     </Transition>
 
-    <div 
+    <div
       ref="scrollContainer"
       class="overflow-y-auto"
       :style="{ height: 'calc(100vh - 60px)' }"
@@ -141,7 +168,9 @@
     >
       <div v-if="isLoadingContent" class="h-full flex items-center justify-center">
         <div class="text-center">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-400 mx-auto mb-4"></div>
+          <div
+            class="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-400 mx-auto mb-4"
+          ></div>
           <p :class="['text-sm', themeClasses.subtext]">Завантаження тексту...</p>
         </div>
       </div>
@@ -162,7 +191,7 @@
         v-else
         class="px-6 py-8 pb-32"
         :class="[themeClasses.bg, themeClasses.text]"
-        :style="{ 
+        :style="{
           fontSize: readerSettings.fontSize + 'px',
           lineHeight: readerSettings.lineHeight,
           fontFamily: currentFontFamily
@@ -173,16 +202,15 @@
             {{ chapterTitle }}
           </h2>
           <div class="space-y-6">
-            <p 
-              v-for="(paragraph, pIndex) in paragraphs"
-              :key="pIndex"
-              class="leading-relaxed"
-            >
+            <p v-for="(paragraph, pIndex) in paragraphs" :key="pIndex" class="leading-relaxed">
               <span
                 v-for="(word, wIndex) in paragraph.words"
                 :key="`${pIndex}-${wIndex}`"
                 @click="openWordDetail(word, paragraph.text)"
-                :class="['cursor-pointer rounded px-1 transition-all duration-150 hover:scale-105 inline', themeClasses.wordHover]"
+                :class="[
+                  'cursor-pointer rounded px-1 transition-all duration-150 hover:scale-105 inline',
+                  themeClasses.wordHover
+                ]"
               >
                 {{ word }}{{ ' ' }}
               </span>
@@ -195,7 +223,10 @@
               :disabled="isUpdatingProgress"
               class="px-8 py-4 bg-teal-400 text-white font-semibold rounded-3xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span v-if="isUpdatingProgress" class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
+              <span
+                v-if="isUpdatingProgress"
+                class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"
+              ></span>
               <span>{{ isUpdatingProgress ? 'Завантаження...' : 'Далі' }}</span>
               <ChevronRight v-if="!isUpdatingProgress" class="w-5 h-5" />
             </button>
@@ -227,9 +258,9 @@
 
 <script setup>
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
-import axios from 'axios'
 import { ArrowLeft, Settings, Minus, Plus, ChevronRight } from 'lucide-vue-next'
 import WordDetailSheet from '../components/reader/WordDetailSheet.vue'
+import api, { getErrorMessage } from '@/shared/api/client'
 
 const props = defineProps({
   book: {
@@ -250,11 +281,7 @@ const props = defineProps({
   }
 })
 
-
-
 const emit = defineEmits(['close'])
-
-const API_URL = import.meta.env.VITE_API_URL
 
 const isLoadingContent = ref(false)
 const contentError = ref('')
@@ -275,8 +302,8 @@ const loadSettings = () => {
   if (saved) {
     try {
       return JSON.parse(saved)
-    } catch (e) {
-      console.error('Failed to parse saved settings:', e)
+    } catch {
+      // ignore invalid persisted settings and fallback to defaults
     }
   }
   return {
@@ -289,16 +316,24 @@ const loadSettings = () => {
 
 const readerSettings = ref(loadSettings())
 
-watch(readerSettings, (newSettings) => {
-  localStorage.setItem('readerSettings', JSON.stringify(newSettings))
-}, { deep: true })
+watch(
+  readerSettings,
+  (newSettings) => {
+    localStorage.setItem('readerSettings', JSON.stringify(newSettings))
+  },
+  { deep: true }
+)
 
 const showSettings = ref(false)
 
 const fontFamilies = [
-  { id: 'system', label: 'Система', value: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' },
-  { id: 'serif', label: 'Serif', value: 'Georgia, "Times New Roman", serif' },
-  { id: 'mono', label: 'Mono', value: '"Courier New", monospace' }
+  {
+    id: 'system',
+    label: 'Система',
+    value: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  },
+  { id: 'serif', label: 'Класичний', value: 'Georgia, "Times New Roman", serif' },
+  { id: 'mono', label: 'Моно', value: '"Courier New", monospace' }
 ]
 
 const themes = [
@@ -311,15 +346,18 @@ const paragraphs = computed(() => {
   if (!chapterContent.value) return []
   return chapterContent.value
     .split('\n')
-    .filter(line => line.trim())
-    .map(paragraph => ({
+    .filter((line) => line.trim())
+    .map((paragraph) => ({
       text: paragraph.trim(),
       words: paragraph.trim().split(/\s+/)
     }))
 })
 
 const currentFontFamily = computed(() => {
-  return fontFamilies.find(f => f.id === readerSettings.value.fontFamily)?.value || fontFamilies[0].value
+  return (
+    fontFamilies.find((f) => f.id === readerSettings.value.fontFamily)?.value ||
+    fontFamilies[0].value
+  )
 })
 
 const themeClasses = computed(() => {
@@ -383,19 +421,21 @@ const decreaseFontSize = () => {
 }
 
 const increaseLineHeight = () => {
-  if (readerSettings.value.lineHeight < 2.2) readerSettings.value.lineHeight = Math.round((readerSettings.value.lineHeight + 0.1) * 10) / 10
+  if (readerSettings.value.lineHeight < 2.2)
+    readerSettings.value.lineHeight = Math.round((readerSettings.value.lineHeight + 0.1) * 10) / 10
 }
 
 const decreaseLineHeight = () => {
-  if (readerSettings.value.lineHeight > 1.4) readerSettings.value.lineHeight = Math.round((readerSettings.value.lineHeight - 0.1) * 10) / 10
+  if (readerSettings.value.lineHeight > 1.4)
+    readerSettings.value.lineHeight = Math.round((readerSettings.value.lineHeight - 0.1) * 10) / 10
 }
 
 const handleScroll = () => {
   if (!scrollContainer.value) return
-  
+
   const scrollTop = scrollContainer.value.scrollTop
   const scrollHeight = scrollContainer.value.scrollHeight - scrollContainer.value.clientHeight
-  
+
   if (scrollHeight > 0) {
     currentPosition.value = scrollTop / scrollHeight
     readingProgress.value = Math.round(currentPosition.value * 100)
@@ -404,9 +444,9 @@ const handleScroll = () => {
 
 const scrollToPosition = async (position) => {
   if (position <= 0 || !scrollContainer.value) return
-  
+
   await nextTick()
-  
+
   setTimeout(() => {
     if (scrollContainer.value) {
       const scrollHeight = scrollContainer.value.scrollHeight - scrollContainer.value.clientHeight
@@ -416,7 +456,7 @@ const scrollToPosition = async (position) => {
   }, 100)
 }
 
-// --- TRANSLATION LOGIC (Word Click) ---
+
 
 const isWordSheetOpen = ref(false)
 const selectedWord = ref({
@@ -432,18 +472,15 @@ const selectedWord = ref({
 const extractSentence = (word, paragraphText) => {
   if (!paragraphText) return ''
 
-  const sentences = paragraphText.match( /[^\.!\?]+[\.!\?]+/g ) || [paragraphText]
-  
+  const sentences = paragraphText.match(/[^.!?]+[.!?]+/g) || [paragraphText]
 
-  const match = sentences.find(s => s.includes(word))
+  const match = sentences.find((s) => s.includes(word))
   return match ? match.trim() : paragraphText
 }
 
 const openWordDetail = async (rawWord, paragraphText) => {
-
   const cleanWord = rawWord.replace(/[.,!?;:()""«»]/g, '').trim()
   if (!cleanWord) return
-
 
   const sentence = extractSentence(rawWord, paragraphText)
 
@@ -454,17 +491,16 @@ const openWordDetail = async (rawWord, paragraphText) => {
     translation: '',
     additionalTranslations: [],
     contextSentence: sentence,
-    sentenceTranslation: '' 
+    sentenceTranslation: ''
   }
   isWordSheetOpen.value = true
 
-
   try {
-    const response = await axios.post(`${API_URL}/translation/translate/word`, {
+    const response = await api.post('/translation/translate/word', {
       text: cleanWord,
-      src_lang: "english",
-      dest_lang: "ukrainian"
-    }, { withCredentials: true })
+      src_lang: 'english',
+      dest_lang: 'ukrainian'
+    })
 
     const data = response.data
 
@@ -478,13 +514,11 @@ const openWordDetail = async (rawWord, paragraphText) => {
     }
 
     if (sentence) {
-        fetchSentenceTranslation(sentence)
+      fetchSentenceTranslation(sentence)
     } else {
-        selectedWord.value.sentenceTranslation = 'Не знайдено речення'
+      selectedWord.value.sentenceTranslation = 'Не знайдено речення'
     }
-
-  } catch (error) {
-    console.error('Basic translation error:', error)
+  } catch {
     selectedWord.value = {
       ...selectedWord.value,
       isLoading: false,
@@ -494,36 +528,29 @@ const openWordDetail = async (rawWord, paragraphText) => {
 }
 
 const fetchSentenceTranslation = async (text) => {
-    try {
-        const response = await axios.post(`${API_URL}/translation/sentence`, {
-            text: text,
-            src_lang: "english",
-            dest_lang: "ukrainian"
-        }, { withCredentials: true })
+  try {
+    const response = await api.post('/translation/sentence', {
+      text: text,
+      src_lang: 'english',
+      dest_lang: 'ukrainian'
+    })
 
-        selectedWord.value.sentenceTranslation = response.data.translation
-    } catch (error) {
-        console.error('Sentence translation error:', error)
-        selectedWord.value.sentenceTranslation = 'Не вдалося перекласти речення'
-    }
+    selectedWord.value.sentenceTranslation = response.data.translation
+  } catch {
+    selectedWord.value.sentenceTranslation = 'Не вдалося перекласти речення'
+  }
 }
 
-const handleAddToDictionary = (word) => {
-  console.log('Added to dictionary:', word)
-
+const handleAddToDictionary = () => {
 }
-
-
 
 const loadAllChapters = async () => {
   try {
-    const response = await axios.get(`${API_URL}/book/${props.book.id}/chapters`, {
-      withCredentials: true
-    })
+    const response = await api.get(`/book/${props.book.id}/chapters`)
     allChapters.value = response.data.sort((a, b) => a.order_number - b.order_number)
-    
+
     if (currentChapter.value) {
-      const currentIndex = allChapters.value.findIndex(ch => ch.id === currentChapter.value.id)
+      const currentIndex = allChapters.value.findIndex((ch) => ch.id === currentChapter.value.id)
       if (currentIndex !== -1 && currentIndex < allChapters.value.length - 1) {
         nextChapter.value = allChapters.value[currentIndex + 1]
       } else {
@@ -531,7 +558,7 @@ const loadAllChapters = async () => {
       }
     }
   } catch (error) {
-    console.error('Помилка завантаження розділів:', error)
+    void error
   }
 }
 
@@ -544,23 +571,20 @@ const loadContent = async () => {
   isLoadingContent.value = true
   contentError.value = ''
   currentChapter.value = props.initialChapter
-  
+
   try {
-    const response = await axios.get(`${API_URL}/book/chapter/${props.initialChapter.id}/content`, {
-      withCredentials: true
-    })
-    
+    const response = await api.get(`/book/chapter/${props.initialChapter.id}/content`)
+
     chapterContent.value = response.data.content || ''
     chapterTitle.value = props.initialChapter.title || 'Розділ'
-    
+
     await loadAllChapters()
-    
+
     if (props.initialPosition > 0) {
       scrollToPosition(props.initialPosition)
     }
-  } catch (error) {
-    console.error('Помилка завантаження контенту:', error)
-    contentError.value = 'Не вдалося завантажити текст розділу. Перевірте з\'єднання.'
+  } catch {
+    contentError.value = "Не вдалося завантажити текст розділу. Перевірте з'єднання."
   } finally {
     isLoadingContent.value = false
   }
@@ -570,41 +594,34 @@ const handleNextChapter = async () => {
   if (!nextChapter.value) {
     return
   }
-  
+
   isUpdatingProgress.value = true
-  
+
   try {
     if (localUserBookId.value) {
-      await axios.put('/api/v1/reader/update', {
+      await api.put('/reader/update', {
         user_book_id: localUserBookId.value,
-        chapter_id: nextChapter.value.id, 
+        chapter_id: nextChapter.value.id,
         position: 0.0
-      }, {
-        withCredentials: true
       })
     }
-    
+
     currentChapter.value = nextChapter.value
-    const response = await axios.get(`${API_URL}/book/chapter/${nextChapter.value.id}/content`, {
-      withCredentials: true
-    })
-    
+    const response = await api.get(`/book/chapter/${nextChapter.value.id}/content`)
+
     chapterContent.value = response.data.content || ''
     chapterTitle.value = nextChapter.value.title || 'Розділ'
-    
+
     await loadAllChapters()
-    
 
     if (scrollContainer.value) {
       scrollContainer.value.scrollTo({ top: 0, behavior: 'smooth' })
     }
-    
 
     currentPosition.value = 0
     readingProgress.value = 0
   } catch (error) {
-    console.error('Помилка переходу до наступного розділу:', error)
-    alert('Не вдалося завантажити наступний розділ')
+    contentError.value = getErrorMessage(error, 'Не вдалося завантажити наступний розділ.')
   } finally {
     isUpdatingProgress.value = false
   }
@@ -612,18 +629,16 @@ const handleNextChapter = async () => {
 
 const getUserBookId = async () => {
   if (localUserBookId.value) return
-  
+
   try {
-    const response = await axios.get(`${API_URL}/reader/`, {
-      withCredentials: true
-    })
+    const response = await api.get('/reader/')
     const userBooks = response.data.items || response.data || []
-    const userBook = userBooks.find(b => b.book_id === props.book.id)
+    const userBook = userBooks.find((b) => b.book_id === props.book.id)
     if (userBook) {
       localUserBookId.value = userBook.id || userBook.user_book_id
     }
   } catch (error) {
-    console.error('Помилка отримання user_book_id:', error)
+    void error
   }
 }
 
