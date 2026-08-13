@@ -68,7 +68,7 @@ jobs:
             VITE_ENABLE_ERUDA=${{ secrets.VITE_ENABLE_ERUDA }}
         
   deploy:
-    name: Деплой (production)
+    name: Деплой
     runs-on: ubuntu-latest
     needs: build-and-push
     if: github.ref == 'refs/heads/main'
