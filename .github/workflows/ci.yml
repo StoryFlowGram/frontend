@@ -34,6 +34,9 @@ jobs:
       - name: Встановлення залежностей (Install dependencies)
         run: npm ci
 
+      - name: Збірка проекту (Build project)
+        run: npm run build
+
       - name: Настройка Docker Buildx
         uses: docker/setup-buildx-action@v3
       
@@ -82,7 +85,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /home/deployer/sfg-app
+            cd /home/deployer/spaced-repetition-bot/SFG-infra
 
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker compose -f docker-compose-prod.yaml pull
